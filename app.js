@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
 
-const app = express();
 const PORT = process.env.PORT || 3001;
 
+const app = express();
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
@@ -13,7 +13,6 @@ app.use(bodyParser.json());
 
 app.post("/send-deeplink", (req, res) => {
   const { deviceId, deepLinkUrl } = req.body;
-
   if (!deviceId || !deepLinkUrl) {
     return res.status(400).send("Device ID and deep link URL are required.");
   }
@@ -33,15 +32,18 @@ app.post("/send-deeplink", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 server.on("error", (err) => {
   if (err.code === "EADDRINUSE") {
     console.error(
       `Port ${PORT} is already in use. Please use a different port.`
     );
-    process.exit(1); // Optionally exit the process
+    process.exit(1);
   }
+});
+
+process.on("SIGTERM", () => {
+  console.log("Shutting down server...");
+  server.close(() => {
+    console.log("Server has shut down.");
+  });
 });
