@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const { exec } = require("child_process");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
@@ -32,6 +32,15 @@ app.post("/send-deeplink", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(
+      `Port ${PORT} is already in use. Please use a different port.`
+    );
+    process.exit(1); // Optionally exit the process
+  }
 });
