@@ -12,12 +12,15 @@ const server = app.listen(PORT, () => {
 app.use(bodyParser.json());
 
 app.post("/send-deeplink", (req, res) => {
+  console.log("Received ADB request:", req.body);
   const { deviceId, deepLinkUrl } = req.body;
   if (!deviceId || !deepLinkUrl) {
+    console.log("Missing deviceId or deepLinkUrl in request.");
     return res.status(400).send("Device ID and deep link URL are required.");
   }
 
   const adbCommand = `adb -s ${deviceId} shell am start -a android.intent.action.VIEW -d "${deepLinkUrl}"`;
+  console.log("Executing ADB command:", adbCommand);
 
   exec(adbCommand, (error, stdout, stderr) => {
     if (error) {
@@ -28,6 +31,7 @@ app.post("/send-deeplink", (req, res) => {
       console.error(`Stderr: ${stderr}`);
       return res.status(500).send("Error in executing deep link command");
     }
+    console.log(`ADB command successful: ${stdout}`);
     res.send(`Deep link command sent successfully: ${stdout}`);
   });
 });
